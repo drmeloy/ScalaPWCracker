@@ -16,3 +16,4 @@ project/plugins/project/
 ### Scala template
 *.class
 *.log
+*.sc
