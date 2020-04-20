@@ -4,6 +4,13 @@ trait Hacker {
   def generatePasswords(charSet: CharSet, minLength: Int, maxLength: Int): List[String]
 }
 
-object HackerMan extends Hacker {
+trait HackerMan extends Hacker {
   override def generatePasswords(charSet: CharSet, minLength: Int, maxLength: Int): List[String] = ???
+}
+
+/**
+ * Travis + HackerMan = TrhackerMan
+ */
+object TrhackerMan extends HackerMan {
+  // Needs to contain Jackson
 }
