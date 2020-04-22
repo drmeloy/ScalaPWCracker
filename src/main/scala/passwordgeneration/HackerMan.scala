@@ -8,25 +8,37 @@ trait Hacker {
  * Travis + HackerMan = TrhackerMan
  */
 object TrhackerMan extends Hacker {
-  // Needs to contain Jackson
-  // Maybe birth year 1991/91 & maybe other chars
-  override def generatePasswords(charSet: CharSet = Trascii, minLength: Int = 6, maxLength: Int = 15): Stream[String] = {
+  override def generatePasswords(charSet: CharSet = Trascii, minLength: Int = 7, maxLength: Int = 15): Stream[String] = {
+    if(minLength < 7 || maxLength < 7) throw new Exception("Password must be at least of length 7!!! Password MUST contain the word Jackson!!!")
     val name = "Jackson"
     val namePermutations = name #:: name.toLowerCase #:: name.toUpperCase #:: Stream.empty
     val birthYear = "1991" #:: "91" #:: Stream.empty
-//    val parts: Stream[String] = namePermutations ++ birthYear ++ Trascii.asList.map(_.toString)
     val charStream = Trascii.asList.map(_.toString).toStream
+    val parts: Stream[String] = namePermutations ++ birthYear ++ charStream
+
     def generateNextPasswords(currentPassword: String): Stream[String] = {
-      if (currentPassword.length == maxLength) {
-        currentPassword #:: Stream.empty
-      }
-      else if (currentPassword.length > maxLength) {
-        Stream.empty
+      if (currentPassword.isEmpty) {
+        val nextPossibleParts = getNextPossibleParts("")
+        nextPossibleParts.flatMap(generateNextPasswords(_))
       }
       else {
-        currentPassword #:: charStream.flatMap(char => generateNextPasswords(currentPassword ++ char))
+        if (currentPassword.length == maxLength) {
+          currentPassword #:: Stream.empty
+        }
+        else {
+          val nextPossibleParts = getNextPossibleParts(currentPassword)
+          currentPassword #:: nextPossibleParts.flatMap(part => generateNextPasswords(currentPassword + part))
+        }
       }
     }
-    generateNextPasswords(name)
+
+    def getNextPossibleParts(currentPassword: String): Stream[String] = {
+      if (currentPassword.toLowerCase.contains("jackson") && (currentPassword.toLowerCase.contains("1991") || currentPassword.toLowerCase.contains("91"))) charStream
+      else if (currentPassword.toLowerCase.contains("jackson")) charStream ++ birthYear
+      else if (currentPassword.toLowerCase.contains("1991") || currentPassword.contains("91")) charStream ++ namePermutations
+      else parts
+    }
+
+    generateNextPasswords("")
   }
 }

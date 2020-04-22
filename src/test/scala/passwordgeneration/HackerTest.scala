@@ -7,12 +7,20 @@ class HackerTest extends Specification {
   val maxPasswordLength = 15
 
   "Password generation" >> {
-    "0 length returns 0 passwords" >> {
-      TrhackerMan.generatePasswords(Ascii, 0, 0).length === 0
+    "Max length less than 7 returns an Exception" >> {
+      TrhackerMan.generatePasswords(Ascii, 7, 0) must throwA[Exception]
     }
 
-    "1-character password list should be equal to the character set" >> {
-      TrhackerMan.generatePasswords(Ascii, 1, 1) === Ascii.asList.map(_.toString).toStream
+    "Min length less than 7 returns an Exception" >> {
+      TrhackerMan.generatePasswords(Ascii, 0, 7) must throwA[Exception]
+    }
+
+//    "1-character password list should be equal to the character set" >> {
+//      TrhackerMan.generatePasswords(Ascii, 1, 1) === Ascii.asList.map(_.toString).toStream
+//    }
+
+    "7 max length results in the possible permutations of Jackson" >> {
+      TrhackerMan.generatePasswords(Trascii, 7, 7) === Stream("Jackson", "jackson", "JACKSON")
     }
 
     "All generated passwords contain the word Jackson and capitalization permutations of Jackson are present" >> {
