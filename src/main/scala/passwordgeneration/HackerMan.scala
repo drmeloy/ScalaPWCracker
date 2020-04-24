@@ -1,5 +1,7 @@
 package passwordgeneration
 
+import scala.annotation.tailrec
+
 trait Hacker {
   def generatePasswords(charSet: CharSet, minLength: Int, maxLength: Int): Stream[String]
 }
@@ -9,9 +11,11 @@ trait Hacker {
  */
 object TrhackerMan extends Hacker {
   override def generatePasswords(charSet: CharSet = Trascii, minLength: Int = 7, maxLength: Int = 15): Stream[String] = {
-    if(minLength < 7 || maxLength < 7) throw new Exception("Password must be at least of length 7!!! Password MUST contain the word Jackson!!!")
+    val minPasswordLength = 5
+    if(minLength < minPasswordLength || maxLength < minPasswordLength) throw new Exception(s"Password must be at least of length $minPasswordLength!!!")
     val name = "Jackson"
-    val namePermutations = name #:: name.toLowerCase #:: name.toUpperCase #:: Stream.empty
+    val username = "jhlee"
+    val namePermutations = name #:: name.toLowerCase #:: name.toUpperCase #:: username #:: Stream.empty
     val birthYear = "1991" #:: "91" #:: Stream.empty
     val charStream = Trascii.asList.map(_.toString).toStream
     val parts: Stream[String] = namePermutations ++ birthYear ++ charStream
@@ -19,11 +23,15 @@ object TrhackerMan extends Hacker {
     def generateNextPasswords(currentPassword: String): Stream[String] = {
       if (currentPassword.isEmpty) {
         val nextPossibleParts = getNextPossibleParts("")
-        nextPossibleParts.flatMap(generateNextPasswords(_))
+        nextPossibleParts.flatMap(generateNextPasswords)
       }
       else {
         if (currentPassword.length == maxLength) {
           currentPassword #:: Stream.empty
+        }
+        else if (currentPassword.length < minLength) {
+          val nextPossibleParts = getNextPossibleParts(currentPassword)
+          nextPossibleParts.flatMap(part => generateNextPasswords(currentPassword + part))
         }
         else {
           val nextPossibleParts = getNextPossibleParts(currentPassword)

@@ -15,19 +15,15 @@ class HackerTest extends Specification {
       TrhackerMan.generatePasswords(Ascii, 0, 7) must throwA[Exception]
     }
 
-//    "1-character password list should be equal to the character set" >> {
-//      TrhackerMan.generatePasswords(Ascii, 1, 1) === Ascii.asList.map(_.toString).toStream
-//    }
-
-    "7 max length results in the possible permutations of Jackson" >> {
-      TrhackerMan.generatePasswords(Trascii, 7, 7) === Stream("Jackson", "jackson", "JACKSON")
+    "All of the Trascii character set should be used in some password" >> {
+      val passwords = TrhackerMan.generatePasswords(Ascii, 5, 5).take(10000)
+      Trascii.asList.map(_.toString).forall(passwords.contains(_))
     }
 
     "All generated passwords contain the word Jackson and capitalization permutations of Jackson are present" >> {
-      val passwords = TrhackerMan.generatePasswords().take(1000)
-      passwords.forall(_.toLowerCase.contains("jackson")) &&
-      passwords.exists(_.contains("Jackson")) &&
-      passwords.exists(_.contains("JACKSON")) &&
+      val passwords = TrhackerMan.generatePasswords().take(10000)
+      passwords.exists(_.contains("Jackson")) and
+      passwords.exists(_.contains("JACKSON")) and
       passwords.exists(_.contains("jackson"))
     }
 
@@ -37,13 +33,9 @@ class HackerTest extends Specification {
     }
 
     "There are no duplicate passwords" >> {
-      val passwords = TrhackerMan.generatePasswords(maxLength = 9)
+      val passwords = TrhackerMan.generatePasswords(maxLength = 5).take(1000)
       val uniquePasswords = passwords.toSet
       passwords.length === uniquePasswords.size
-    }
-
-    "Password will return current password if current password is max length" >> {
-      TrhackerMan.generatePasswords(maxLength = 7) === "Jackson" #:: Stream.empty
     }
   }
 }
